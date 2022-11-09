@@ -5,6 +5,7 @@ Configurar o CDNs:
 2. Configurar https://fontawesome.com/ CDN
 
 
+
 Instalar no Chrome:  
 1. React Developer Tools
 2. Redux DevTools
