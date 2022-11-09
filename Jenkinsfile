@@ -14,7 +14,7 @@ podTemplate(cloud: 'kubernetes',
         def ENVIRONMENT
         def IMAGE_POSFIX = ""
         def KUBE_NAMESPACE 
-        def IMAGE_VERSION = "staging"
+        def IMAGE_VERSION
         def GIT_REPOS_URL = "git@github.com:alefligiero/frontend-questcode.git"
         def GIT_BRANCH
         def HELM_CHART_NAME = "questcode/frontend"
