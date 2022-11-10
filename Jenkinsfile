@@ -8,20 +8,20 @@ podTemplate(cloud: 'kubernetes',
     volumes: [hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock')]
 ) 
 {
+    def REPOS
+    def IMAGE_NAME = "questcode-frontend"
+    def ENVIRONMENT
+    def IMAGE_POSFIX = ""
+    def KUBE_NAMESPACE 
+    def IMAGE_VERSION
+    def GIT_REPOS_URL = "git@github.com:alefligiero/frontend-questcode.git"
+    def GIT_BRANCH
+    def HELM_CHART_NAME = "questcode/frontend"
+    def HELM_DEPLOY_NAME
+    def CHARTMUSEUM_URL = "http://my-chartmuseum:8080"
+    def NODE_PORT = "30080"
+
     node ('questcode') {
-        def REPOS
-        def IMAGE_NAME = "questcode-frontend"
-        def ENVIRONMENT
-        def IMAGE_POSFIX = ""
-        def KUBE_NAMESPACE 
-        def IMAGE_VERSION
-        def GIT_REPOS_URL = "git@github.com:alefligiero/frontend-questcode.git"
-        def GIT_BRANCH
-        def HELM_CHART_NAME = "questcode/frontend"
-        def HELM_DEPLOY_NAME
-        def CHARTMUSEUM_URL = "http://my-chartmuseum:8080"
-        def NODE_PORT = "30080"
-        
         stage('Checkout') {
             echo 'Iniciando clone do repositório'
             REPOS = checkout([$class: 'GitSCM', branches: [[name: '*/master'], [name: '*/develop']], extensions: [], userRemoteConfigs: [[credentialsId: 'github', url: GIT_REPOS_URL]]])
