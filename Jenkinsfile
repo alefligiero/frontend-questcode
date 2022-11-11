@@ -8,20 +8,20 @@ podTemplate(cloud: 'kubernetes',
     volumes: [hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock')]
 ) 
 {
+    def REPOS
+    def IMAGE_NAME = "questcode-frontend"
+    def ENVIRONMENT
+    def IMAGE_POSFIX = ""
+    def KUBE_NAMESPACE 
+    def IMAGE_VERSION
+    def GIT_REPOS_URL = "git@github.com:alefligiero/frontend-questcode.git"
+    def GIT_BRANCH
+    def HELM_CHART_NAME = "questcode/frontend"
+    def HELM_DEPLOY_NAME
+    def CHARTMUSEUM_URL = "http://my-chartmuseum:8080"
+    def INGRESS_HOST = "questcode.org"
+
     node ('questcode') {
-        def REPOS
-        def IMAGE_NAME = "questcode-frontend"
-        def ENVIRONMENT
-        def IMAGE_POSFIX = ""
-        def KUBE_NAMESPACE 
-        def IMAGE_VERSION = "staging"
-        def GIT_REPOS_URL = "git@github.com:alefligiero/frontend-questcode.git"
-        def GIT_BRANCH
-        def HELM_CHART_NAME = "questcode/frontend"
-        def HELM_DEPLOY_NAME
-        def CHARTMUSEUM_URL = "http://my-chartmuseum:8080"
-        def NODE_PORT = "30080"
-        
         stage('Checkout') {
             echo 'Iniciando clone do repositório'
             REPOS = checkout([$class: 'GitSCM', branches: [[name: '*/master'], [name: '*/develop']], extensions: [], userRemoteConfigs: [[credentialsId: 'github', url: GIT_REPOS_URL]]])
@@ -33,7 +33,7 @@ podTemplate(cloud: 'kubernetes',
                 KUBE_NAMESPACE = "staging"
                 ENVIRONMENT = "staging"
                 IMAGE_POSFIX = "-RC"
-                NODE_PORT = "31080"
+                INGRESS_HOST = "staging.questcode.org"
             } else {
                 def error = "Não existe pipeline para a branch ${GIT_BRANCH}"
                 echo error
@@ -62,9 +62,9 @@ podTemplate(cloud: 'kubernetes',
                 sh 'helm search repo questcode'
                 sh 'helm repo update'
                 try {
-                    sh "helm upgrade ${HELM_DEPLOY_NAME} ${HELM_CHART_NAME} --set image.tag=${IMAGE_VERSION} -n ${KUBE_NAMESPACE} --set service.nodePort=${NODE_PORT}"
+                    sh "helm upgrade ${HELM_DEPLOY_NAME} ${HELM_CHART_NAME} --set image.tag=${IMAGE_VERSION} -n ${KUBE_NAMESPACE} --set ingress.host[0]=${INGRESS_HOST}"
                 } catch(Exception e) {
-                    sh "helm install ${HELM_DEPLOY_NAME} ${HELM_CHART_NAME} -n ${KUBE_NAMESPACE} --set service.nodePort=${NODE_PORT}"
+                    sh "helm install ${HELM_DEPLOY_NAME} ${HELM_CHART_NAME} -n ${KUBE_NAMESPACE} --set ingress.host[0]=${INGRESS_HOST}"
                 }
             }
             
