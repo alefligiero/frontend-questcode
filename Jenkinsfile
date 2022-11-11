@@ -24,12 +24,12 @@ podTemplate(cloud: 'kubernetes',
     node ('questcode') {
         stage('Checkout') {
             echo 'Iniciando clone do repositório'
-            REPOS = checkout([$class: 'GitSCM', branches: [[name: '*/master'], [name: '*/develop']], extensions: [], userRemoteConfigs: [[credentialsId: 'github', url: GIT_REPOS_URL]]])
+            REPOS = checkout scm
             GIT_BRANCH = REPOS.GIT_BRANCH
-            if(GIT_BRANCH.equals("origin/master")) {
+            if(GIT_BRANCH.equals("master")) {
                 KUBE_NAMESPACE = "prod"
                 ENVIRONMENT = "prod"
-            } else if (GIT_BRANCH.equals("origin/develop")) {
+            } else if (GIT_BRANCH.equals("develop")) {
                 KUBE_NAMESPACE = "staging"
                 ENVIRONMENT = "staging"
                 IMAGE_POSFIX = "-RC"
